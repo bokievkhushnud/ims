@@ -1,0 +1,74 @@
+<div class="card card-default collapsed-card">
+  <div class="card-header">
+    <h3 class="card-title">Filter {{title}}</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+  </div>
+  <!-- /.card-header -->
+  <div class="card-body">
+    <form class="row" id="filterform" target="_self" method="GET" action="{% url title|lower %}">
+      {% csrf_token %}
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Category</label>
+          <select class="form-control" name="category" id="cat_select" style="width: 100%;">
+            {% if search_filters.category == "" %}
+            <option value="">All</option>
+            {% else %}
+            <option value="">All</option>
+            {% endif %}
+            {% for category in categories %}
+            {% if category.name == search_filters.category %}
+            <option selected value="{{category}}">{{category|title}} </option>
+            {% else %}
+            <option value="{{category}}">{{category|title}} </option>
+            {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <!-- /.form-group -->
+
+        <div class="form-group">
+          <label>Item Type</label>
+          <select class="form-control" name="item_type" id="item_type" style="width: 100%;">
+            <option {% if search_filters.item_type == "" %}selected{% endif %} value="">All</option>
+            <option {% if search_filters.item_type == "asset" %}selected{% endif %} value="asset">Asset</option>
+            <option {% if search_filters.item_type == "accessory" %}selected{% endif %} value="accessory">Accessory</option>
+            <option {% if search_filters.item_type == "consumable" %}selected{% endif %} value="consumable">Consumable</option>
+          </select>
+        </div>
+        <!-- /.form-group -->
+      </div>
+      <!-- /.col -->
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" name="status" id="status_select" style="width: 100%;">
+            <option {% if search_filters.status == "" %}selected{% endif %} value="">All</option>
+            <option {% if search_filters.status == "available" %}selected{% endif %} value="available">Available</option>
+            <option {% if search_filters.status == "broken" %}selected{% endif %} value="broken">Broken</option>
+            <option {% if search_filters.status == "outinuse" %}selected{% endif %} value="outinuse">In Use</option>
+          </select>
+        </div>
+        <!-- /.form-group -->
+        <div class="form-group">
+          <label>Arrival Date</label>
+          <input type="date" class="form-control" value="{{search_filters.date_recieved}}" name="date_recieved"
+            id="date_recieved_filter">
+          <input type="hidden" name="q" id="" value="{{search_filters.q}}">
+        </div>
+        <!-- /.form-group -->
+      </div>
+
+      <div class="col-12 float-right">
+        <button id="filterformbtn" class="btn btn-primary" type="submit">Apply Filter</button>
+        <button class="btn btn-default" id="reset_filter">Reset Filter</button>
+      </div>
+      <!-- /.col -->
+    </form>
+  </div>
+
+</div>

@@ -1,0 +1,227 @@
+{% extends 'main.html' %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 d-inline">Print Qr-Code</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <!-- <form id="searchform" class="input-group input-group-sm float-sm-right" style="width: 150px;"
+                        method="GET" , action="{% url 'items' %}">
+                        <input type="text" name="q" value="{{search_filters.q}}" class="form-control"
+                            placeholder="Search">
+                        <input type="hidden" value="{{search_filters.category}}" name="category">
+                        <input type="hidden" value="{{search_filters.item_type}}" name="item_type">
+                        <input type="hidden" value="{{search_filters.status}}" name="status">
+                        <input type="hidden" value="{{search_filters.date_recieved}}" name="date_recieved">
+                        <div class="input-group-append">
+                            <button id="searchformbtn" type="submit" class="btn btn-default">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form> -->
+
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+    <!-- Main content -->
+    <section class="content">
+        <!-- <div class="container-fluid"> -->
+        <form class="container-fluid" id="printform" name="pdf_form" target="pdf_frame" method="POST" action="{% url 'generate_pdf' %}">
+            <div class="card card-default ">
+                <div class="card-header">
+                    <h3 class="card-title">Print Options</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div class="row">
+                        {% csrf_token %}
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Image Size</label>
+                                <input class="form-control" name="size" value="50" type="number" min="0">
+                            </div>
+                            <!-- /.form-group -->
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Images Gap</label>
+                                <input class="form-control" name="gap" value="10" type="number" min="0">
+                            </div>
+                            <!-- /.form-group -->
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Margin Y</label>
+                                <input class="form-control" name="mx" value="20" type="number" min="0">
+                            </div>
+                            <!-- /.form-group -->
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Margin X</label>
+                                <input class="form-control" name="my" value="30" type="number" min="0">
+                            </div>
+                            <!-- /.form-group -->
+                        </div>
+                        <!-- /.col -->
+
+
+                        <div class="col-12 float-right">
+                            <button class="btn btn-primary" type="submit">Preview</button>
+                            <!-- <button  class="btn btn-default" >Reset Changes</button> -->
+                            <input type="reset" class="btn btn-default" value="Reset">
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Main row -->
+                    <div class="row">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex align-items-center">
+                                    <h3 class="card-title">Print QR</h3>
+                                    <div class="btn btn-default ml-auto" role="button" data-toggle="modal"
+                                        data-target="#modal-items">Add Item</div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table table-hover text-nowrap">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Item</th>
+                                                <th>Category</th>
+                                                <th>Type</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in items %}
+                                            <tr class="{{item.id}}">
+                                                <td>{{forloop.counter}}</td>
+                                                <td>
+                                                    <a href="{% url 'item_detail' item.id %}">{{item.item_name}}</a>
+                                                    <input type="checkbox" checked name="item_id" value="{{item.id}}"
+                                                        class="d-none">
+                                                </td>
+                                                <td>{{item.category}}</td>
+                                                <td>{{item.item_type}}</td>
+                                                <td>
+                                                    <button onclick="deleteRow(this)"
+                                                        class="btn m-0 p-0">Delete</button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card-->
+                        </div>
+                        <!-- right col -->
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+                    <iframe src="{% url 'generate_pdf' %}" name="pdf_frame" frameborder="0" width="100%" height="500px">
+                </div>
+            </div>
+            </iframe>
+        </form><!-- /.container-fluid -->
+
+        <div class="modal fade" id="modal-items">
+            <form method="post" id="print_qr" action="{% url 'print_qr' %}" class="modal-dialog">
+                {% csrf_token %}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Select Items to Add</h4>
+                        <button id="closeqr1" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% if all_items %}
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in all_items %}
+                                <tr>
+                                    <td> <input type="checkbox" name="item_id" value="{{item.id}}"></td>
+                                    <td>
+                                        <a href="{% url 'item_detail' item.id %}">{{item.item_name}}</a>
+                                    </td>
+                                    <td>{{item.category}}</td>
+                                    <td>{{item.item_type}}</td>
+
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-center text-muted">All items are in the printing list</p>
+                        {% endif %}
+
+                        {% for i in items %}
+
+                        <input id="{{i.id}}" type="checkbox" checked name="item_id" value="{{i.id}}" class="d-none">
+                        {% endfor %}
+
+
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Item</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </form>
+            <!-- /.modal-dialog -->
+        </div>
+    </section>
+
+    <!-- Modal for adding more elements -->
+
+
+    <script>
+        window.onload = function () {
+            document.forms['pdf_form'].submit();
+        }
+        function deleteRow(button) {
+            // Get the row that contains the button
+            var row = button.parentNode.parentNode;
+            var toRemove = row.classList.value
+            // Remove the row from the table
+            document.getElementById(toRemove).remove()
+            row.parentNode.removeChild(row);
+            document.getElementById("print_qr").submit()
+
+        }
+
+
+    </script>
+
+    {% endblock %}

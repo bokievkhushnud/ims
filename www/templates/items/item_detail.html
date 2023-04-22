@@ -1,0 +1,261 @@
+{% extends 'main.html' %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Details</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">{{item.item_name}}</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="card card-solid">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-sm-6 d-flex justify-content-center align-items-center">
+                        <div class="col-12 d-flex justify-content-center align-items-center">
+                            <img src="{{item.image.url}}" class="figure-img img-fluid" alt="{{item.image.url}}"
+                                style="max-height: 400px;">
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <h3 class="my-3">
+                            <p><em>{{item.item_name}}</em></p>
+                        </h3>
+                        <hr>
+                        <h4 class="mt-3">Quantity:</h4>
+                        <p class="h5 text-secondary"> - {{item.quantity}} <em>{{item.quantity_unit}}</em></p>
+
+                        <h4 class="mt-3">Category:</h4>
+                        <p class="h5 text-secondary"> - {{item.category}}</p>
+                        <h4 class="mt-3">Code: <p class="h5 text-secondary "> - {{item.item_code}}</p>
+                        </h4>
+
+                        <h4 class="mt-3">Status:</h4> - <span
+                            class="badge bg-{% if item.status == 'available' %}success{% elif item.status == 'broken' %}danger{% else %}warning{%endif%}"
+                            style="font-size: medium;">{{item.status}}</span>
+
+
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4 class="mt-3">Location:</h4>
+                        <p> - {{item.location}}</p>
+                        <h4 class="mt-3">Holder:</h4>
+                        {% if item.item_type == "asset" %}
+                        <p> - {%for i in item.holder.all%}{{i}}{% endfor %}</p>
+                        {% else %}
+                        <p> - {{item.holder.all.count}}</p>
+                        {% endif %}
+                        <h4 class="mt-3">Order Number:</h4>
+                        <p> - {{item.order_number}}</p>
+
+                    </div>
+                    <div class="col-md-4">
+                        <h4 class="mt-3">Price:</h4>
+                        <p> - {{item.price}} <em>{{item.currency}}</em></p>
+                        <h4 class="mt-3">Campus:</h4>
+                        <p> - {{item.campus}}</p>
+                        <h4 class="mt-3">Notes:</h4>
+                        <p> - {{item.notes}}</p>
+
+                    </div>
+                    <div class="col-md-4">
+                        <h4 class="mt-3">Date Received:</h4>
+                        <p> - {{item.date_received}}</p>
+                        <h4 class="mt-3">Expiration Date:</h4>
+                        <p> - {{item.expiration_date}}</p>
+                        <h4 class="mt-3">Description:</h4>
+                        <p> - {{item.description}}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4 class="mt-3">Min Alert:</h4>
+                        <p> - {{item.min_alert_quantity}}</p>
+
+                    </div>
+                    <div class="col-md-4">
+                        <h4 class="mt-3">Vendor:</h4>
+                        <p> - {{item.vendor}}</p>
+
+                    </div>
+                    <div class="col-md-4">
+                        <h4 class="mt-3">QR - code:</h4>
+                        <img src="/media/qrcode/{{item.qr_code}}" class="m-0" alt="Product Image"
+                            style="max-height: 200px;">
+
+                    </div>
+
+                </div>
+                <hr>
+                {% if request.user.is_authenticated %}
+                <div class="row">
+                    <div class="col">
+                        {% if item.item_type == "asset" %}
+                        <a href="{% url 'update_items' item.id %}" class="btn btn-primary m-1">Update</a>
+                        {% else %}
+                        <a href="{% url 'update_consumable' item.id %}" class="btn btn-primary m-1">Update</a>
+                        {% endif %}
+                        {% if item.status == "available" %}
+                        <form class="d-inline" action="{% url 'checkout_items' item.id %}" method="get">
+                            {% csrf_token %}
+                            <input type="checkbox" name="item_id" value="{{item.id}}" class="option d-none">
+                            <input type="submit" class="btn btn-warning m-1" value="Check Out">
+                        </form>
+                        {% else %}
+                            {% if item.item_type == "asset" %}
+                                {% for i in checked_out_items %}
+                                    {% if i.status == "out" %}
+                                    <a href="{% url 'checkin_items' i.id %}" class="btn btn-success m-1">Check In</a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                        <form action="{% url 'bulk_delete' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_id" value="{{item.id}}" class="option" >
+                            <input type="submit" class="btn btn-danger  m-1" value="Delete"> 
+                        </form>
+                        {% if item.status == 'broken' %}
+                        <a href="{% url 'fix' item.id %}" class="btn btn-success">Fixed</a>
+                        {% else %}
+                        <a href="{% url 'broken' item.id %}" class="btn btn-warning">Out of order</a>
+                        {% endif %}
+                        <a  class="btn btn-default m-1" href="{% url 'print_qr' item.id %}">Print QR</a>
+                        
+
+                    </div>
+                   
+                </div>
+                <div class="row mt-4">
+                    <nav class="w-100">
+                        <div class="nav nav-tabs" id="product-tab" role="tablist">
+                            <a class="nav-item nav-link" id="product-desc-tab" data-toggle="tab" href="#product-desc"
+                                role="tab" aria-controls="product-desc" aria-selected="false">History</a>
+                            <a class="nav-item nav-link active" id="product-comments-tab" data-toggle="tab"
+                                href="#product-comments" role="tab" aria-controls="product-comments"
+                                aria-selected="true">Checked Out</a>
+                            <!-- <a class="nav-item nav-link" id="product-rating-tab" data-toggle="tab"
+                                href="#product-rating" role="tab" aria-controls="product-rating"
+                                aria-selected="false">Checked In</a> -->
+                        </div>
+                    </nav>
+
+
+                    <div class="tab-content table-responsive p-3" id="nav-tabContent">
+                        <div class="tab-pane fade" id="product-desc" role="tabpanel" aria-labelledby="product-desc-tab">
+                            <!-- History of items -->
+                            {% if item_history %}
+                            <table class="table table-hover text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Requestor</th>
+                                        <th>Location</th>
+                                        <th>Quantity</th>
+                                        <th>Due Date</th>
+                                        <th>Checked by</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for items_hist in item_history %}
+                                    <tr
+                                        class="{% if items_hist.transaction.action == 'assign' %}bg-danger{% else %} bg-success {% endif %}">
+                                        <td>{{items_hist.item.item_name}}</td>
+                                        <td>{{items_hist.transaction.requestor}}</td>
+                                        <td>{{items_hist.transaction.location}}</td>
+                                        <td>{{items_hist.transaction.quantity}}</td>
+                                        <td>{{items_hist.transaction.due_date}}</td>
+                                        <td>{{items_hist.transaction.done_by}}</td>
+                                        <td>{{items_hist.timestamp}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="text-muted">No history available for this item</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Checked out items -->
+                        <div class="tab-pane fade active show" id="product-comments" role="tabpanel"
+                            aria-labelledby="product-comments-tab">
+                            {% if checked_out_items %}
+                            <table class="table table-hover text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Requestor</th>
+                                        <th>Location</th>
+                                        <th>Quantity</th>
+                                        <th>Due Date</th>
+                                        <th>Checked by</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for his in checked_out_items %}
+                                    <tr
+                                        class="{% if his.action == 'assign' %}bg-danger{% else %} bg-success {% endif %}">
+                                        <td> {{his.item.item_name}}</td>
+                                        <td>{{his.requestor}}</td>
+                                        <td>{{his.location}}</td>
+                                        <td>{{his.quantity}}</td>
+                                        <td>{{his.due_date}}</td>
+                                        <td>{{his.done_by}}</td>
+                                        <td>{{his.date}}</td>
+                                        <td>
+                                            <a href="{% url 'checkin_items' his.id %}" class="btn btn-success m-1">Check
+                                                In</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="text-muted">This Item is in storage, it is not checked Out.</p>
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="tab-pane fade" id="product-rating" role="tabpanel"
+                            aria-labelledby="product-rating-tab">
+
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+
+
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+{% endblock %}

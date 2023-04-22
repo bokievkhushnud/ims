@@ -1,0 +1,507 @@
+{% extends 'main.html' %}
+{% block content %}
+{% load i18n %}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">{% trans "Dashboard" %}</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                        <li class="breadcrumb-item active">Dashboard</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Small boxes (Stat box) -->
+            <div class="row">
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3>{{total_count}}</h3>
+
+                            <p>Total Items</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-bag"></i>
+                        </div>
+                        <span class="small-box-footer p-3"></span>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3>{{available_count}}</h3>
+                            <p>Items Available</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                        <span class="small-box-footer p-3"></span>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3>{{checked_out_count}}</h3>
+
+                            <p>Items Out</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-person-add"></i>
+                        </div>
+                        <span class="small-box-footer p-3"></span>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3>{{broken_count}}</h3>
+                            <p>Broken Items</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-pie-graph"></i>
+                        </div>
+                        <span class="small-box-footer p-3"></span>
+                    </div>
+                </div>
+                <!-- ./col -->
+            </div>
+            <div class="raw">
+                <div class="col m-0 p-0">
+                    <!-- Category chart-->
+                    <div class="card card-default">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Categories
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"
+                                    title="Collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                        </div><!-- /.card-header -->
+                        <div class="card-body">
+                            <div class="tab-content p-0">
+                                <!-- Morris chart - Sales -->
+                                <div class="chart tab-pane active" id="revenue-chart"
+                                    style="position: relative; height: 300px;">
+                                    <canvas id="revenue-chart-canvas" height="300"
+                                        style="height: 300px; position:relative;">
+                                    </canvas>
+                                </div>
+                            </div>
+                        </div><!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+            <div class="row">
+                <!-- Left col -->
+                <section class="col-lg-7 ">
+
+                    <!-- Recently checked out -->
+                    <div class="card card-success">
+                        <div class="card-header bg-warnning">
+                            <h3 class="card-title">Recently Checked Out</h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0" style="height:267px;">
+                            {% if recently_checked_out_items %}
+                            <table class="table table-striped text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10px">#</th>
+                                        <th>Item</th>
+                                        <th>Location</th>
+                                        <th>Requestor</th>
+                                        <th>Checked Out</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in recently_checked_out_items %}
+                                    <tr>
+                                        <td>{{forloop.counter}}.</td>
+                                        <td>{{item.item.item_name}}</td>
+                                        <td>
+                                            {{item.location}}
+                                        </td>
+                                        <td>{{item.requestor.first_name}}</td>
+                                        <td>{{item.date}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="text-center mt-4">No Data Available</p>
+                            {% endif %}
+
+
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+
+                        </div>
+                        <!-- /.card-footer-->
+                    </div>
+                    <!-- /.Recently checked out -->
+
+                    <!-- Broken Items -->
+                    <div class="card card-danger">
+                        <div class="card-header ">
+                            <h3 class="card-title">Broken Items</h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0" style="height:267px;">
+                            {% if broken_items %}
+                            <table class="table table-striped text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10px">#</th>
+                                        <th>Item</th>
+                                        <th>Location</th>
+                                        <th>Code</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in broken_items %}
+                                    <tr>
+                                        <td>{{forloop.counter}}.</td>
+                                        <td><a href="{% url 'item_detail' item.id %}">{{item.item_name}}</a></td>
+                                        <td>{{item.location}}</td>
+                                        <td>{{item.item_code}}</td>
+                                    </tr>
+                                    {% endfor %}
+
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="text-center mt-4">No Data Available</p>
+                            {% endif %}
+
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+
+                        </div>
+                        <!-- /.card-footer-->
+                    </div>
+                    <!-- /.Broken Items -->
+
+                    <!-- Due return Items -->
+                    <div class="card card-warning">
+                        <div class="card-header bg-warnning">
+                            <h3 class="card-title">Items to be returned</h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0" style="height:250px;">
+                            {% if items_due_return %}
+                            <table class="table table-striped text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10px">#</th>
+                                        <th>Item</th>
+                                        <th>Location</th>
+                                        <th>Requestor</th>
+                                        <th>Due Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items_due_return %}
+                                    <tr>
+                                        <td>{{forloop.counter}}.</td>
+                                        <td><a href="{% url 'item_detail' item.item.id %}">{{item.item.item_name}}</a>
+                                        </td>
+                                        <td>{{item.location}}</td>
+                                        <td>{{item.requestor}}</td>
+                                        <td>{{item.due_date}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="text-center mt-4">No Data Available</p>
+
+                            {% endif %}
+
+
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+
+                        </div>
+                        <!-- /.card-footer-->
+                    </div>
+                    <!-- /.Due return Items -->
+                </section>
+                <!-- /.Left col -->
+
+                <!-- right col -->
+                <section class="col-lg-5 ">
+
+                    <!-- Items Added chart -->
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <h3 class="card-title">
+                                Items Added
+                            </h3>
+                            <!-- card tools -->
+                            <div class="card-tools">
+
+                                <select type="button" class="btn m-0 p-0" onchange="fetchData(this.value)">
+                                    {% for year in years %}
+                                    <option value="{{year}}">{{year}}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"
+                                    title="Collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <!-- /.card-tools -->
+                        </div>
+                        <div class="card-body">
+                            <canvas class="chart" id="line-chart"
+                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                        </div>
+                        <!-- /.card-body-->
+
+                    </div>
+                    <!-- /.card -->
+
+                    <!-- Char for Item Types -->
+                    <div class="card ">
+                        <div class="card-header border-0">
+                            <h3 class="card-title">Item Types</h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart">
+                                <canvas id="barChart"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+
+                    <!-- Items in shortage -->
+                    <div class="card ">
+                        <div class="card-header">
+                            <h3 class="card-title">Items in Shortage</h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0" style="height:250px;">
+                            {% if items_in_shortage %}
+                            <table class="table table-striped text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10px">#</th>
+                                        <th>Item</th>
+                                        <th>Category</th>
+                                        <th>Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items_in_shortage %}
+                                    <tr>
+                                        <td>{{forloop.counter}}.</td>
+                                        <td><a href="{% url 'item_detail' item.id %}">{{item}}</a></td>
+                                        <td>{{item.category}}</td>
+                                        <td>{{item.quantity}}</td>
+
+                                    </tr>
+                                    {% endfor %}
+
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="text-center mt-4">No Data Available</p>
+                            {% endif %}
+
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+
+                        </div>
+                        <!-- /.card-footer-->
+                    </div>
+                    <!-- /.Items in shortage -->
+                </section>
+                <!-- right col -->
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+
+    <!-- /.content -->
+</div>
+
+
+<script>
+
+    // Category Chart
+    var ctx = document.getElementById('revenue-chart-canvas').getContext('2d');
+    var myBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ category_names| safe }},
+    datasets: [{
+        label: 'Categories',
+        data: {{ item_quantities| safe }},
+        backgroundColor: 'rgba(19,93,200,1)'
+                
+                    }]
+            },
+    options: {
+        responsive: true,
+            maintainAspectRatio	: false,
+        },
+    });
+    // Item types Chart
+    var ctxPieChart = document.getElementById('barChart').getContext('2d');
+    var myPieChart = new Chart(ctxPieChart, {
+        type: 'pie',
+        data: {
+            labels: {{ type_label| safe }},
+    datasets: [{
+        label: 'Item Types',
+        data: {{ type_data| safe }},
+            }]
+        },
+    options: {
+        responsive: true,
+            maintainAspectRatio	: false,
+    },
+    });
+    let months_labels = []
+    let months_data = []
+
+    var ctxLine = document.getElementById('line-chart').getContext('2d');
+    var itemsChart = new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: months_labels,
+            datasets: [{
+                label: 'My First Dataset',
+                data: months_data,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        },
+    });
+
+
+
+    // items added by month
+    function fetchData(year = 2023) {
+        // Create a new XMLHttpRequest object
+        const xhr = new XMLHttpRequest();
+        // Set up the callback function for handling a successful request
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 400) {
+                const responseData = JSON.parse(xhr.responseText);
+
+                itemsChart.data.labels = responseData.months;
+                itemsChart.data.datasets[0].data = responseData.items_added;
+                itemsChart.update();
+            } else {
+                console.error('Error fetching data:', xhr.statusText);
+            }
+        };
+        // Set up the callback function for handling errors
+        xhr.onerror = function () {
+            console.error('Request failed');
+        };
+
+        // Initialize the request
+        xhr.open('GET', `/get_monthly_added_items/${year}`, true);
+
+        // Send the request
+        xhr.send();
+    }
+
+    fetchData(2023)
+</script>
+
+
+
+{% endblock %}

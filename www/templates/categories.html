@@ -1,0 +1,135 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row  mb-2">
+        <div class="col-sm-6 d-flex">
+          <h1 class="m-0 d-inline">Categories</h1>
+        </div><!-- /.col -->
+
+
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+  <!-- Main content -->
+
+
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="card card-default">
+        <div class="card-header">
+          <h3 class="card-title">Add Category</h3>
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+              <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <!-- Form to add new Category -->
+        <div class="card-body" style="display: block;">
+          {% if title == 'Categories' %}
+            <form method="post" action="{% url form_url %}" class="row">
+          {% else %}
+            <form method="post" action="{% url 'update_category' pk %}" class="row">
+          {% endif %}
+
+
+            {% csrf_token %}
+            {{form}}
+            <div class="mt-3">
+              {% if title == 'Categories' %}
+              <input type="submit" class="btn btn-success" value="New Category">
+              {% else %}
+              <input type="submit" class="btn btn-success" value="Update Category">
+              {% endif %}
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- table -->
+      {% if title == 'Categories' %}
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Categories</h3>
+
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+          <table id="example1" class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Code</th>
+                <th>Description</th>
+                <th>action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cat in categories %}
+              <tr>
+                <td>{{cat.name}}</td>
+                <td>{{cat.cat_code}}</td>
+                <td>{{cat.description}}</td>
+                <td>
+                  <div class="input-group-prepend   ml-auto">
+                    <button type="button" class="btn  m-0 dropdown-toggle" data-toggle="dropdown">
+                      Action
+                    </button>
+                    <div class="dropdown-menu">
+                      <a href="{% url 'delete_category' cat.id %}" class="dropdown-item">Delete</a>
+
+                      <a href="{% url 'update_category' cat.id %}" class="dropdown-item">Edit</a>
+
+
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      {% endif %}
+
+
+    </div>
+
+
+
+</div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+</div>
+
+<script>
+  $(function () {
+    var table = $("#example1").DataTable({
+      "buttons": ["csv", "excel", "pdf", "print"],
+      'searching': true,
+      //"dom": '<"toolbar d-flex justify-content-between"Bl><"mt-3"t>p',   
+      "dom": '<"table-header d-flex justify-content-between"lf><"table-body"t><"table-footer d-flex justify-content-between"ip>',
+
+      "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+      "ordering": false,
+      "paging": true,
+      "responsive": true,
+
+
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+  });
+</script>
+
+
+
+{% endblock %}

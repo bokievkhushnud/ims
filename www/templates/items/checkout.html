@@ -1,0 +1,104 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Check Out</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                        <li class="breadcrumb-item active">Check Out</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Main row -->
+            <form class="card-body row bg-white" action="{% url 'checkout_items' item.id %}" method="post">
+                {% csrf_token %}
+                <div class="col-md-5  d-flex  justify-content-center">
+                    <div class="mt-2">
+                        <img class="img-fluid" src="{{item.image.url}}" alt="">
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="form-group">
+                        <label for="inputName">Item Name</label>
+                        <a class="form-control" href="{% url 'item_detail' item.id %}">{{item.item_name}}</a>
+                        <input type="hidden" name="item_id" value="{{item.id}}">
+                        <!-- <p class="form-control">{{item.item.item_name}}</p> -->
+                    </div>
+
+                    {% if item.item_type == "asset" %}
+                    <input type="hidden" name="quantity" value="1">
+
+                    {% else %}
+                    <div class="form-group">
+                        <label for="inputSubject">Quantity</label>
+                        <input class="form-control" min="0" placeholder="some number" name="quantity" type="number"
+                            max="{{item.quantity}}">
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="inputSubject">Location</label>
+                        <input required name="location" class="form-control" type="text" placeholder="location">
+
+                    </div>
+                    <div class="form-group">
+                        <label for="inputSubject">Return Date</label>
+                        <input type="date" name="due_date" class="form-control ">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputMessage" class="text-start">Notes</label>
+                        <textarea id="inputMessage" name="notes" class="form-control" rows="4"></textarea>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label  for="inputSubject">Requestor</label>
+                        <select required  class="form-control" name="requestor" id="">
+                            {% for user in users %}
+                            <option value="{{user.id}}">{{user.username}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                   
+
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-success" value="Check Out">
+                    </div>
+                </div>
+            </form>
+            <!-- /.row (main row) -->
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+<script>
+    console.log("Hello")
+
+    console.log(document.querySelector('#id_image'))
+
+    document.querySelector('#id_image').addEventListener('change', function () {
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.querySelector('#image_preview').src = e.target.result;
+        };
+        reader.readAsDataURL(this.files[0]);
+    });
+</script>
+
+{% endblock %}

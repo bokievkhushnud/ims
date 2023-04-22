@@ -1,0 +1,136 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<!-- Navbar -->
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Profile</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item active">User Profile</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">
+
+          <!-- Profile Image -->
+          <div class="card card-primary card-outline">
+
+            <div class="card-body box-profile">
+              <div class="text-center">
+                <img class="profile-user-img img-fluid img-circle" src="{{profile.profile_pic.url}}"
+                  alt="User profile picture">
+              </div>
+
+              <h3 class="profile-username text-center">{{profile.owner.first_name}} {{profile.owner.last_name}}</h3>
+
+              <p class="text-muted text-center">{{profile.owner.email}}</p>
+
+              <ul class="list-group list-group-unbordered mb-3">
+                <li class="list-group-item">
+                  <b>Items</b> <a class="float-right">1</a>
+                </li>
+                <li class="list-group-item">
+                  <b>Department</b> <a class="float-right">{{profile.owner.department}}</a>
+                </li>
+              </ul>
+              <form action="{% url 'profile' %}" id="upload_form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="id_profile_pic" style="width:100%;">
+                  <p class="btn btn-primary btn-block mb-0"><b>Update Profile Pic</b></p>
+                </label>
+                <div class="d-none">
+                  {{form.profile_pic}}
+                </div>
+
+              </form>
+
+              <a href="{% url 'password_change' %}" class="btn btn-default btn-block"><b>Change Password</b></a>
+
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+          <!-- /.card -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-9">
+          <div class="card">
+            <div class="card-header p-2">
+              <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link" href="#">Items</a></li>
+              </ul>
+            </div><!-- /.card-header -->
+            <div class="card-body">
+              <div class="tab-content">
+                <div class="active tab-pane" id="">
+                  <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap">
+                      <thead>
+                        <tr>
+                          <th>Item</th>
+                          <th>Location</th>
+                          <th>Checkout Date</th>
+                          <th>Due Date</th>
+                          <th>Checked Out By</th>
+                          <th>Notes</th>
+
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in items %}
+                        <tr>
+                          <td> <a href="{% url 'item_detail' item.id %}">{{item.item.item_name}}</a></td>
+                          <td>{{item.location}}</td>
+                          <td>{{item.date |date:"M d, Y"}}</td>
+                          <td>{{item.due_date |date:"M d, Y"}}</td>
+                          <td>{{item.done_by}}</td>
+                          <td>{{item.notes}}</td>
+
+                        </tr>
+
+
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+
+                </div>
+
+              </div>
+              <!-- /.tab-content -->
+            </div><!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <script>
+    // User Picture Upload
+    const prfile_pic_upload = document.getElementById("id_profile_pic");
+    const profile_form = document.getElementById('upload_form');
+    
+
+    prfile_pic_upload.addEventListener('change', () => {
+      profile_form.submit();
+    });
+
+  </script>
+  {% endblock %}
